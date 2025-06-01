@@ -1,0 +1,39 @@
+# Load necessary packages
+library(ggplot2)
+library(ggrepel)
+
+# Load data
+df <- Results2025_05_05
+
+# Select comparison: C1_vs_C3 (UV vs Control)
+df$log2FC <- df$log_ratios_C4_vs_C3
+df$FDR <- df$FDR_PolySTest_C4_vs_C3
+
+# Calculate -log10(FDR)
+df$neg_log10_FDR <- -log10(df$FDR)
+
+# Classify points as (upregulated/downregulated/not significant)
+df$Regulation <- "Not significant"
+df$Regulation[df$log2FC > 1 & df$FDR < 0.05] <- "Enriched"
+df$Regulation[df$log2FC < -1 & df$FDR < 0.05] <- "Depleted"
+
+df_top <- df[df$Regulation != "Not significant", ]
+df_top <- df_top[order(df_top$FDR), ][1:10, ]  # top 10 most significant
+
+
+# Volcano plot
+ggplot(df, aes(x = log2FC, y = neg_log10_FDR, color = Regulation)) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(values = c("Enriched" = "red", "Depleted" = "blue", "Not significant" = "grey")) +
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +
+  labs(title = "Volcano Plot: UV vs Control",
+       x = "Log2 Fold Change",
+       y = "-Log10(FDR)") +
+  theme_minimal()
+
+df <- df[is.finite(df$log2FC) & is.finite(df$neg_log10_FDR), ]
+df$neg_log10_FDR <- -log10(df$FDR)
+df$neg_log10_FDR[!is.finite(df$neg_log10_FDR)] <- NA
+
+#This code is used to make a Volcano plot for all three conditions compared with the control.
