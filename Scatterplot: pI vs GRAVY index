@@ -1,0 +1,35 @@
+#Load necessary packages
+Library(ggplot2)
+
+#Create the data frame (the 8 unique proteins from UV-biodegraded)
+data <- data.frame(
+  Protein = c("P15259", "P56715", "Q96C03", "P55039", "O43865", "P55285", "P62424", "P35998"),
+  pI = c(8.99, 5.55, 5.01, 9.02, 6.48, 4.58, 10.61, 5.72),
+  Gravy = c(-0.55296442687747, -0.63130797773655, 0.077533039647577, -0.13571428571429, -0.26528301886792, -0.47544303797468, -0.54699248120301, -0.4161662817552)
+)
+
+# Create the scatterplot
+ggplot(data, aes(x = pI, y = Gravy, label = Protein)) +
+  geom_point(color = "blue", size = 3) +
+  geom_text(vjust = -1, size = 3.5) +
+  labs(title = "Scatterplot: 8 unque proteins from UV-biodegraded",
+       x = "Isoelectric Point (pI)",
+       y = "GRAVY Index") +
+  theme_minimal()
+
+#Create the data frame (top 10 most depleted Proteins)
+data <- data.frame(
+  Protein = c("P02774", "P02787", "Q6ZN30", "Q14574", "P02768", 
+              "Q9UGM5", "A0A087WSY6", "P02753", "P02763", "P02655"),
+  pI = c(5.16, 6.7, 6.07, 5.02, 5.67, 6.53, 8.09, 5.27, 5.11, 4.58),
+  Gravy = c(-0.336, -0.336, -0.612, -0.397, -0.354, -0.317, 0.01, -0.433, -0.541, -0.169)
+)
+
+# Create the scatterplot
+ggplot(data, aes(x = pI, y = Gravy, label = Protein)) +
+  geom_point(color = "blue", size = 3) +
+  geom_text(vjust = -1, size = 3.5) +
+  labs(title = "Scatterplot: Depleted Proteins",
+       x = "Isoelectric Point (pI)",
+       y = "GRAVY Index") +
+  theme_minimal()
