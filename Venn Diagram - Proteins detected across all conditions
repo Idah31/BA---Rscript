@@ -1,0 +1,23 @@
+#Load necessary packages
+library(ggVennDiagram)
+exists("ggVennDiagram")  # Skal returnere TRUE
+
+#Load Data
+df<-Proteins_presents_in_conditions
+
+# Create a vector of unique protein identifiers, split by semicolon, with all NAs removed.
+split_proteins <- function(x) {
+  unique(unlist(strsplit(na.omit(x), ";")))
+}
+
+# Create lists for each column
+protein_lists <- list(
+  Bio     = split_proteins(df$Bio),
+  BioUV   = split_proteins(df$BioUV),
+  UV      = split_proteins(df$UV),
+  Control = split_proteins(df$Kontrol)
+)
+
+#Plot Venn Diagram
+ggVennDiagram(protein_lists, label_alpha = 0.5, label = "count") +
+  ggplot2::labs(title = "Venn-diagram: Proteins in Bio, BioUV, UV og Control")
