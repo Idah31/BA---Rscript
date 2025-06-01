@@ -1,0 +1,35 @@
+#Load necessary packages
+library(tibble)
+install.packages("tidyverse")
+library(tidyverse)
+
+
+# Data
+df <- tribble(
+  ~Condition, ~Total, ~Unique, ~Enriched, ~Depleted,
+  "Bio",      532,    2,       34,         139,
+  "BioUV",    545,    8,       14,         108,
+  "UV",       540,    1,       33,         32
+)
+
+# Calculate 'Other' proteins as the remainder (Total minus the sum of known proteins)
+df <- df %>%
+  mutate(Other = Total - (Unique + Enriched + Depleted))
+
+# Convert data to long format
+df_long <- df %>%
+  select(Condition, Unique, Enriched, Depleted, Other) %>%
+  pivot_longer(cols = -Condition, names_to = "Category", values_to = "Count")
+
+
+# Plot with labels
+ggplot(df_long, aes(x = Condition, y = Count, fill = Category)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count), position = position_stack(vjust = 0.5), size = 3) +
+  labs(title = "Protein Composition per Condition",
+       x = "Condition", y = "Number of Proteins") +
+  scale_fill_manual(values = c("Enriched" = "red",
+                               "Depleted" = "blue",
+                               "Unique" = "violet",
+                               "Protein" = "grey80")) +
+  theme_minimal()
