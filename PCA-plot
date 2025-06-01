@@ -1,0 +1,43 @@
+# Load necessary packages
+library(tidyverse)
+library(ggplot2)
+
+# Read data
+data <- Results2025_05_05
+
+# Select only the desired columns
+selected_cols <- c("Bio1", "BioUV4", "K1", "UV1", "Bio2", "BioUV5", "K2", "UV2", "Bio3", "BioUV6", "K3", "UV3")
+data_selected <- data[, selected_cols]
+
+# Remove rows with NA values
+data_selected <- na.omit(data_selected)
+
+# Transpose the data so that samples are rows and variables are columns
+data_t <- t(data_selected)
+
+# PCA on the transposed data
+pca <- prcomp(data_t, scale. = TRUE)
+
+# Extract scores
+pca_df <- as.data.frame(pca$x)
+pca_df$Sample <- rownames(pca_df)
+
+# Add group (Bio, BioUV, K, UV)
+pca_df$Group <- case_when(
+  grepl("Bio", pca_df$Sample) & !grepl("UV", pca_df$Sample) ~ "Bio",
+  grepl("BioUV", pca_df$Sample) ~ "BioUV",
+  grepl("^K", pca_df$Sample) ~ "Control",
+  grepl("^UV", pca_df$Sample) ~ "UV"
+)
+aes(x = PC1, y = PC2, color = Group, label = Sample)
+
+
+# PCA plot with labels
+ggplot(pca_df, aes(x = PC1, y = PC2, color = Group)) +
+  geom_point(size = 4) +
+  geom_text_repel(aes(label = Sample), size = 4) +
+  xlab(paste0("PC1 (", round(explained_var[1], 1), "%)")) +
+  ylab(paste0("PC2 (", round(explained_var[2], 1), "%)")) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
